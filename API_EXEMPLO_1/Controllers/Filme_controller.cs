@@ -1,4 +1,5 @@
-﻿using API.Modelos;
+﻿using API.Data;
+using API.Modelos;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata;
 
@@ -8,34 +9,34 @@ namespace API.Controllers
     [Route("[Controller]")]//Insplicitar a rota de acesso web; Procurar rota por com "controller"
     public class Filme_controller : ControllerBase//Fazer heranca para pegar funcaos basicas de controladores
     {
-        private static List<Filme> filmes = new List<Filme>();
-        private static int Id = 1;
+
+        FilmeContextcs Contextcs;
+
+        public Filme_controller(FilmeContextcs contextcs)
+        {
+            Contextcs = contextcs;
+        }
 
         [HttpPost]//Indicar ação HTTP, como get e set, oque quer realizar na web
         public IActionResult AdicionarFilme([FromBody] Filme filme)
         {
-            filme.Id = Id++;
-            filmes.Add(filme);
+            Contextcs.Filmes.Add(filme);
             return CreatedAtAction(nameof(LocalizarId), new { filme.Id }, filme);//o "CreatedAtAction" ta falando qual é acão que crio esse recurso
             //Parametros: o metodo que encontra , os requisitos que sustenta esse metodo, e o criamos propriamente dito
-            Console.WriteLine(filme.Titulo);
-            Console.WriteLine(filme.Diretor);
-            Console.WriteLine(filme.Duracao);
-            Console.WriteLine(filme.Genero);
         }
 
         [HttpGet]
-        public IActionResult RecuperarFilmes()
+        public IEnumerable<Filme> RecuperarFilmes()
         {
-            return Ok(filmes);
+            return Contextcs.Filmes;
         }
 
         [HttpGet("{id}")]//Diferenciar do get acima, solicitando um parametro na url,no caso, "id"
         public IActionResult LocalizarId(int id)
         {
-            Filme filme = filmes.FirstOrDefault(filme => filme.Id == id);// Da lista de filmes o FirstOrDefault, ou seja, o primeiro que ele encontrar ou Default
+            Filme filme = Contextcs.Filmes.FirstOrDefault(filme => filme.Id == id);// Da lista de filmes o FirstOrDefault, ou seja, o primeiro que ele encontrar ou Default
 
-            if(filme==null)
+            if (filme == null)
                 return NotFound();
             return Ok(filme);
 
@@ -47,6 +48,31 @@ namespace API.Controllers
             //    }
             //}
             //return null;
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult AtualizarFilme(int id, [FromBody] Filme filme)
+        {
+            Filme filmeOld = Contextcs.Filmes.FirstOrDefault(f => f.Id == id);
+            if (filmeOld == null)
+                return NotFound();
+            filmeOld.Titulo = filme.Titulo;
+            filmeOld.Genero = filme.Genero;
+            filmeOld.Diretor = filme.Diretor;
+            filmeOld.Duracao = filme.Duracao;
+            Contextcs.SaveChanges();
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeletarFilme(int id)
+        {
+            Filme filme = Contextcs.Filmes.FirstOrDefault(filme => filme.Id==id);
+            if (filme == null)
+                return NotFound();
+            Contextcs.Remove(filme);
+            Contextcs.SaveChanges();
+            return NoContent();
         }
     }
 }
