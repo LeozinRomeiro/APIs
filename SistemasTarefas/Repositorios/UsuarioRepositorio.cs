@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SistemasTarefas.Data;
 using SistemasTarefas.Models;
 using SistemasTarefas.Repositorios.Interfaces;
@@ -15,8 +16,8 @@ namespace SistemasTarefas.Repositorios
 
 		public async Task<UsuarioModel> Adicionar(UsuarioModel usuario)
 		{
-			baseContex.Usuarios.Add(usuario);
-			baseContex.SaveChanges();
+			await baseContex.Usuarios.AddAsync(usuario);
+			await baseContex.SaveChangesAsync();
 			return usuario;
 		}
 
@@ -27,8 +28,8 @@ namespace SistemasTarefas.Repositorios
             {
                 throw new Exception($"Usuario para o ID:{id}, não foi encontrado ou não existe no banco de dados");
             }
-                      baseContex.Usuarios.Update(usuarioModel);
-            baseContex.SaveChanges();
+            baseContex.Usuarios.Remove(usuarioModel);
+            await baseContex.SaveChangesAsync();
             return true;
         }
 
