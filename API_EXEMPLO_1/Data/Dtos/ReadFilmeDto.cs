@@ -13,6 +13,6 @@ namespace API.Data.Dtos
         public string Genero { get; set; }
 
         [Range(0, 500)] public int Duracao { get; set; }
-        public DateTime HoraConsulta { get; set; }
+        public DateTime HoraConsulta { get; set; } = DateTime.Now;
     }
 }

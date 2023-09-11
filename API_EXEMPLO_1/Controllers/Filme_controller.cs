@@ -24,13 +24,7 @@ namespace API.Controllers
         [HttpPost]//Indicar ação HTTP, como get e set, oque quer realizar na web
         public IActionResult AdicionarFilme([FromBody] CreateFilmeDto filmeDto)
         {
-            Filme filme = new Filme
-            {
-                Titulo = filmeDto.Titulo,
-                Genero = filmeDto.Genero,
-                Duracao = filmeDto.Duracao,
-                Diretor = filmeDto.Diretor,
-            };
+            Filme filme = Mapper.Map<Filme>(filmeDto);
 
             Contextcs.Filmes.Add(filme);
             return CreatedAtAction(nameof(LocalizarId), new { filme.Id }, filme);//o "CreatedAtAction" ta falando qual é acão que crio esse recurso
@@ -50,14 +44,7 @@ namespace API.Controllers
 
             if (filme == null)
                 return NotFound();
-            ReadFilmeDto filmeDto = new ReadFilmeDto
-            {
-                Diretor = filme.Diretor,
-                Duracao = filme.Duracao,
-                Genero = filme.Genero,
-                Titulo = filme.Titulo,
-                HoraConsulta = DateTime.Now,
-            };
+            ReadFilmeDto filmeDto = Mapper.Map<ReadFilmeDto>(filme);
             return Ok(filmeDto);
 
             //foreach (Filme filme in filmes)//intanciar a variavel filme e fazela percorrer o filmes
@@ -73,13 +60,10 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public IActionResult AtualizarFilme(int id, [FromBody] UpdateFilmeDto filmeDto)
         {
-            Filme filmeOld = Contextcs.Filmes.FirstOrDefault(f => f.Id == id);
-            if (filmeOld == null)
+            Filme filme = Contextcs.Filmes.FirstOrDefault(f => f.Id == id);
+            if (filme == null)
                 return NotFound();
-            filmeOld.Titulo = filmeDto.Titulo;
-            filmeOld.Genero = filmeDto.Genero;
-            filmeOld.Diretor = filmeDto.Diretor;
-            filmeOld.Duracao = filmeDto.Duracao;
+            Mapper.Map(filmeDto, filme);
             Contextcs.SaveChanges();
             return NoContent();
         }
