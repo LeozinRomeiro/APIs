@@ -11,6 +11,7 @@ var configuration = new ConfigurationBuilder().SetBasePath(builder.Environment.C
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDbContext<FilmeContextcs>(opts => opts.UseMySQL(configuration.GetConnectionString("FilmeConnection")));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
